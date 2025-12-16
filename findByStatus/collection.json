@@ -1,0 +1,322 @@
+{
+  "info": {
+    "name": "Petstore - findByStatus",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Successful lookup with status available",
+      "request": {
+        "url": "{{baseUrl}}/pet/findByStatus?status=available",
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData = (() => {",
+              "  try {",
+              "    return pm.response.json();",
+              "  } catch (e) {",
+              "    return null;",
+              "  }",
+              "})();",
+              "function resolvePath(obj, path) {",
+              "  if (!obj || typeof path !== 'string') { return undefined; }",
+              "  const segments = path.replace(/\\[(\\d+)\\]/g, '.$1').split('.').filter(Boolean);",
+              "  return segments.reduce((acc, key) => { return acc && acc[key] !== undefined ? acc[key] : undefined; }, obj);",
+              "}",
+              "pm.test(\"Assertion 1: status\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Assertion 2: header_present\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 3: content_type_includes\", function () {",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include(\"application/json\");",
+              "});",
+              "pm.test(\"Assertion 4: json_is_array\", function () {",
+              "  pm.expect(Array.isArray(jsonData)).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 5: json_array_min_length\", function () {",
+              "  const length = Array.isArray(jsonData) ? jsonData.length : 0;",
+              "  pm.expect(length).to.be.at.least(1);",
+              "});",
+              "pm.test(\"Assertion 6: json_path_exists\", function () {",
+              "  pm.expect(resolvePath(jsonData, \"[0].id\") !== undefined).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Successful lookup with status pending",
+      "request": {
+        "url": "{{baseUrl}}/pet/findByStatus?status=pending",
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData = (() => {",
+              "  try {",
+              "    return pm.response.json();",
+              "  } catch (e) {",
+              "    return null;",
+              "  }",
+              "})();",
+              "function resolvePath(obj, path) {",
+              "  if (!obj || typeof path !== 'string') { return undefined; }",
+              "  const segments = path.replace(/\\[(\\d+)\\]/g, '.$1').split('.').filter(Boolean);",
+              "  return segments.reduce((acc, key) => { return acc && acc[key] !== undefined ? acc[key] : undefined; }, obj);",
+              "}",
+              "pm.test(\"Assertion 1: status\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Assertion 2: header_present\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 3: content_type_includes\", function () {",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include(\"application/json\");",
+              "});",
+              "pm.test(\"Assertion 4: json_is_array\", function () {",
+              "  pm.expect(Array.isArray(jsonData)).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 5: json_array_min_length\", function () {",
+              "  const length = Array.isArray(jsonData) ? jsonData.length : 0;",
+              "  pm.expect(length).to.be.at.least(1);",
+              "});",
+              "pm.test(\"Assertion 6: json_path_exists\", function () {",
+              "  pm.expect(resolvePath(jsonData, \"[0].id\") !== undefined).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Successful lookup with status sold",
+      "request": {
+        "url": "{{baseUrl}}/pet/findByStatus?status=sold",
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData = (() => {",
+              "  try {",
+              "    return pm.response.json();",
+              "  } catch (e) {",
+              "    return null;",
+              "  }",
+              "})();",
+              "function resolvePath(obj, path) {",
+              "  if (!obj || typeof path !== 'string') { return undefined; }",
+              "  const segments = path.replace(/\\[(\\d+)\\]/g, '.$1').split('.').filter(Boolean);",
+              "  return segments.reduce((acc, key) => { return acc && acc[key] !== undefined ? acc[key] : undefined; }, obj);",
+              "}",
+              "pm.test(\"Assertion 1: status\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Assertion 2: header_present\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 3: content_type_includes\", function () {",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include(\"application/json\");",
+              "});",
+              "pm.test(\"Assertion 4: json_is_array\", function () {",
+              "  pm.expect(Array.isArray(jsonData)).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 5: json_array_min_length\", function () {",
+              "  const length = Array.isArray(jsonData) ? jsonData.length : 0;",
+              "  pm.expect(length).to.be.at.least(1);",
+              "});",
+              "pm.test(\"Assertion 6: json_path_exists\", function () {",
+              "  pm.expect(resolvePath(jsonData, \"[0].id\") !== undefined).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lookup with multiple statuses available and pending",
+      "request": {
+        "url": "{{baseUrl}}/pet/findByStatus?status=available&status=pending",
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData = (() => {",
+              "  try {",
+              "    return pm.response.json();",
+              "  } catch (e) {",
+              "    return null;",
+              "  }",
+              "})();",
+              "function resolvePath(obj, path) {",
+              "  if (!obj || typeof path !== 'string') { return undefined; }",
+              "  const segments = path.replace(/\\[(\\d+)\\]/g, '.$1').split('.').filter(Boolean);",
+              "  return segments.reduce((acc, key) => { return acc && acc[key] !== undefined ? acc[key] : undefined; }, obj);",
+              "}",
+              "pm.test(\"Assertion 1: status\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Assertion 2: header_present\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 3: content_type_includes\", function () {",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include(\"application/json\");",
+              "});",
+              "pm.test(\"Assertion 4: json_is_array\", function () {",
+              "  pm.expect(Array.isArray(jsonData)).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 5: json_array_min_length\", function () {",
+              "  const length = Array.isArray(jsonData) ? jsonData.length : 0;",
+              "  pm.expect(length).to.be.at.least(1);",
+              "});",
+              "pm.test(\"Assertion 6: json_path_exists\", function () {",
+              "  pm.expect(resolvePath(jsonData, \"[0].id\") !== undefined).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Missing status parameter returns empty array",
+      "request": {
+        "url": "{{baseUrl}}/pet/findByStatus",
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData = (() => {",
+              "  try {",
+              "    return pm.response.json();",
+              "  } catch (e) {",
+              "    return null;",
+              "  }",
+              "})();",
+              "pm.test(\"Assertion 1: status\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Assertion 2: header_present\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 3: content_type_includes\", function () {",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include(\"application/json\");",
+              "});",
+              "pm.test(\"Assertion 4: json_is_array\", function () {",
+              "  pm.expect(Array.isArray(jsonData)).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 5: json_array_min_length\", function () {",
+              "  const length = Array.isArray(jsonData) ? jsonData.length : 0;",
+              "  pm.expect(length).to.be.at.least(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid status unknown",
+      "request": {
+        "url": "{{baseUrl}}/pet/findByStatus?status=unknown",
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData = (() => {",
+              "  try {",
+              "    return pm.response.json();",
+              "  } catch (e) {",
+              "    return null;",
+              "  }",
+              "})();",
+              "pm.test(\"Assertion 1: status\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Assertion 2: header_present\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 3: content_type_includes\", function () {",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include(\"application/json\");",
+              "});",
+              "pm.test(\"Assertion 4: json_is_array\", function () {",
+              "  pm.expect(Array.isArray(jsonData)).to.eql(true);",
+              "});",
+              "pm.test(\"Assertion 5: json_array_min_length\", function () {",
+              "  const length = Array.isArray(jsonData) ? jsonData.length : 0;",
+              "  pm.expect(length).to.be.at.least(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://petstore.swagger.io/v2"
+    }
+  ]
+}

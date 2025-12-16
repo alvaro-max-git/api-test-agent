@@ -1,0 +1,140 @@
+{
+  "name": "Petstore - findByStatus",
+  "baseUrl": "{{baseUrl}}",
+  "defaultHeaders": {
+    "accept": "application/json"
+  },
+  "variables": {
+    "baseUrl": "https://petstore.swagger.io/v2"
+  },
+  "endpoint": {
+    "method": "GET",
+    "path": "/pet/findByStatus"
+  },
+  "testcases": [
+    {
+      "id": "TC-001",
+      "name": "Successful lookup with status available",
+      "method": "GET",
+      "path": "/pet/findByStatus",
+      "query": { "status": ["available"] },
+      "headers": {
+        "accept": "application/json"
+      },
+      "body": null,
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_is_array" },
+        { "type": "json_array_min_length", "min": 1 },
+        { "type": "json_path_exists", "path": "[0].id" }
+      ]
+    },
+    {
+      "id": "TC-002",
+      "name": "Successful lookup with status pending",
+      "method": "GET",
+      "path": "/pet/findByStatus",
+      "query": { "status": ["pending"] },
+      "headers": {
+        "accept": "application/json"
+      },
+      "body": null,
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_is_array" },
+        { "type": "json_array_min_length", "min": 1 },
+        { "type": "json_path_exists", "path": "[0].id" }
+      ]
+    },
+    {
+      "id": "TC-003",
+      "name": "Successful lookup with status sold",
+      "method": "GET",
+      "path": "/pet/findByStatus",
+      "query": { "status": ["sold"] },
+      "headers": {
+        "accept": "application/json"
+      },
+      "body": null,
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_is_array" },
+        { "type": "json_array_min_length", "min": 1 },
+        { "type": "json_path_exists", "path": "[0].id" }
+      ]
+    },
+    {
+      "id": "TC-004",
+      "name": "Lookup with multiple statuses available and pending",
+      "method": "GET",
+      "path": "/pet/findByStatus",
+      "query": { "status": ["available", "pending"] },
+      "headers": {
+        "accept": "application/json"
+      },
+      "body": null,
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_is_array" },
+        { "type": "json_array_min_length", "min": 1 },
+        { "type": "json_path_exists", "path": "[0].id" }
+      ]
+    },
+    {
+      "id": "TC-005",
+      "name": "Missing status parameter returns empty array",
+      "method": "GET",
+      "path": "/pet/findByStatus",
+      "query": {},
+      "headers": {
+        "accept": "application/json"
+      },
+      "body": null,
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_is_array" },
+        { "type": "json_array_min_length", "min": 0 }
+      ]
+    },
+    {
+      "id": "TC-006",
+      "name": "Invalid status unknown",
+      "method": "GET",
+      "path": "/pet/findByStatus",
+      "query": { "status": ["unknown"] },
+      "headers": {
+        "accept": "application/json"
+      },
+      "body": null,
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_is_array" },
+        { "type": "json_array_min_length", "min": 0 }
+      ]
+    }
+  ]
+}

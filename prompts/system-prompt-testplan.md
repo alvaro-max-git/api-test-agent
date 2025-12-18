@@ -28,6 +28,7 @@ Produce:
   - Invalid values according to enum/format.
   - Cases with multiple values (if parameter is array/multi).
 - Write in English, clear style, no ambiguity and from the user's point of view.
+- **Crucial**: Add a comment line `# Target URL: {{baseUrl}}...` in every Scenario to document the expected request URL.
 - Prefer Scenario Outline for simple combinatorics (e.g., status enums).
 - Avoid overly strict checks on the body; use robust checks: type, presence of key fields, non-null arrays, JSON schemas, etc.
 

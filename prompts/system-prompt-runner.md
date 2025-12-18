@@ -45,7 +45,9 @@ Create exactly these files (with content):
 - For each testcase:
   - Create Item with Request.
   - Apply defaultHeaders + testcase headers (testcase headers override).
-  - Construct URL: "{{baseUrl}}" + path.
+  - Construct URL:
+    - Instantiate `const url = new sdk.Url("{{baseUrl}}" + path)`.
+    - For query params, iterate and add safely: `url.query.add(new sdk.QueryParam({ key, value }))`. Do NOT use `addQueryParams` with an array to avoid serialization artifacts.
   - Add "test" Event with an Exec Script (array of strings) generated from assertions.
 - Export collection.json using JSON.stringify(..., null, 2).
 - Console log: Number of processed testcases and path of generated file.

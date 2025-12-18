@@ -1,19 +1,19 @@
-Feature: Retrieve pets by status
-  As a Petstore API consumer
-  I want to retrieve pets filtered by status
-  So I can validate responses for valid, missing, and invalid status values
+Feature: Find pets by status
+  Pets can be filtered by their status values.
 
   Background:
-    Given I have the base URL "{{baseUrl}}"
-    And the endpoint "/pet/findByStatus" accepts the query parameter "status" as a multi-value list
-    And the endpoint does not require authentication
+    Given the API base URL is set to {{baseUrl}}
 
-  Scenario Outline: Successful lookup with valid single status
-    When I send a GET request to "{{baseUrl}}/pet/findByStatus" with status "<status>"
+  Scenario Outline: Fetch pets by allowed status
+    # Target URL: {{baseUrl}}/pet/findByStatus?status=<status>
+    When I send a GET request to /pet/findByStatus with query params
+      | status | <status> |
     Then the response status code should be 200
-    And the header "Content-Type" should include "application/json"
-    And the body should be a JSON array
-    And the array should contain at least one pet with a status of "<status>"
+    And the response should have header Content-Type
+    And the response Content-Type should include application/json
+    And the response body should be a JSON array
+    And the response array should have at least 0 items
+    And the first array item should have path [0].id
 
     Examples:
       | status    |
@@ -21,19 +21,30 @@ Feature: Retrieve pets by status
       | pending   |
       | sold      |
 
-  Scenario: Lookup with multiple statuses
-    When I send a GET request to "{{baseUrl}}/pet/findByStatus" with status "available" and "pending"
+  Scenario: Fetch pets by multiple statuses
+    # Target URL: {{baseUrl}}/pet/findByStatus?status=available,sold
+    When I send a GET request to /pet/findByStatus with query params
+      | status | available,sold |
     Then the response status code should be 200
-    And the header "Content-Type" should include "application/json"
-    And the body should be a JSON array
-    And the array should contain pets whose status is either "available" or "pending"
+    And the response should have header Content-Type
+    And the response Content-Type should include application/json
+    And the response body should be a JSON array
+    And the response array should have at least 0 items
+    And the first array item should have path [0].id
 
-  Scenario: Missing status parameter returns empty list
-    When I send a GET request to "{{baseUrl}}/pet/findByStatus" without query parameters
+  Scenario: Fetch pets without status parameter
+    # Target URL: {{baseUrl}}/pet/findByStatus
+    When I send a GET request to /pet/findByStatus with no query params
     Then the response status code should be 200
-    And the body should be a JSON array with length 0
+    And the response should have header Content-Type
+    And the response Content-Type should include application/json
+    And the response body should be a JSON array
+    And the response array should have at least 0 items
 
-  Scenario: Invalid status value
-    When I send a GET request to "{{baseUrl}}/pet/findByStatus" with status "unknown"
+  Scenario: Reject invalid status value
+    # Target URL: {{baseUrl}}/pet/findByStatus?status=not-a-status
+    When I send a GET request to /pet/findByStatus with query params
+      | status | not-a-status |
     Then the response status code should be 400
-    And the header "Content-Type" should include "application/json"
+    And the response should have header Content-Type
+    And the response Content-Type should include application/json

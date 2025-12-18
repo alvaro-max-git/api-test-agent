@@ -1,12 +1,9 @@
 {
   "name": "qa-agent-postman-poc",
-  "version": "1.0.0",
-  "description": "Generated Postman collection builder for Petstore findByStatus",
-  "main": "build_collection.js",
   "scripts": {
     "build": "node build_collection.js"
   },
   "dependencies": {
-    "postman-collection": "^4.5.0"
+    "postman-collection": "latest"
   }
 }

@@ -1,5 +1,11 @@
 const fs = require("fs");
 const path = require("path");
+const {
+  Collection,
+  Url,
+  Variable,
+  Script
+} = require("postman-collection");
 
 const TESTCASE_PATH = path.join(__dirname, "testcases.json");
 const OUTPUT_PATH = path.join(__dirname, "collection.json");
@@ -25,15 +31,15 @@ function toLiteral(value) {
 }
 
 function addCollectionVariables(collection, variables) {
-  const resolved = variables || {};
-  const baseUrl = resolved.baseUrl || "";
-  collection.variable.push({ key: "baseUrl", value: baseUrl });
+  const resolvedVars = variables || {};
+  const baseUrlValue = resolvedVars.baseUrl || "";
+  collection.variables.add(new Variable({ key: "baseUrl", value: baseUrlValue }));
 
-  Object.keys(resolved).forEach((key) => {
+  Object.keys(resolvedVars).forEach((key) => {
     if (key === "baseUrl") {
       return;
     }
-    collection.variable.push({ key, value: resolved[key] });
+    collection.variables.add(new Variable({ key, value: resolvedVars[key] }));
   });
 }
 
@@ -158,38 +164,44 @@ function buildRequest(testcase, defaultHeaders, variables) {
   ensureContentType(headersObj, testcase.body);
 
   const queryParams = buildQueryParams(testcase.query);
-  const queryString = queryParams
-    .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-    .join("&");
-  const rawUrl = queryString ? `{{baseUrl}}${testcase.path}?${queryString}` : `{{baseUrl}}${testcase.path}`;
+  
+  // Construct the full URL string with query parameters
+  let fullUrl = `{{baseUrl}}${testcase.path}`;
+  if (queryParams.length > 0) {
+    const queryString = queryParams.map(p => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`).join('&');
+    fullUrl += `?${queryString}`;
+  }
+
+  // Use Url helper to parse, but convert to JSON immediately
+  const url = new Url(fullUrl).toJSON();
 
   const headers = Object.entries(headersObj).map(([key, value]) => ({ key, value }));
 
-  const request = {
-    url: rawUrl,
+  const requestDefinition = {
+    url,
     method: testcase.method,
     header: headers
   };
 
   if (testcase.body != null) {
-    request.body = {
-      mode: "raw",
-      raw: typeof testcase.body === "string" ? testcase.body : JSON.stringify(testcase.body, null, 2)
-    };
+    const rawBody = typeof testcase.body === "string" ? testcase.body : JSON.stringify(testcase.body, null, 2);
+    requestDefinition.body = { mode: "raw", raw: rawBody };
   }
 
-  return request;
+  return requestDefinition;
 }
 
 function buildItem(testcase, defaultHeaders, variables) {
   const request = buildRequest(testcase, defaultHeaders, variables);
   const script = buildTestScript(testcase.assertions || []);
 
+  // We can use Script object or plain object. Script object is fine usually.
+  // But let's use plain object for safety.
   const event = {
     listen: "test",
     script: {
-      type: "text/javascript",
-      exec: script
+        type: "text/javascript",
+        exec: script
     }
   };
 
@@ -200,20 +212,13 @@ function buildItem(testcase, defaultHeaders, variables) {
   };
 }
 
-function buildCollectionSkeleton(name) {
-  return {
-    info: {
-      name: name || "Generated Collection",
-      schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-    },
-    item: [],
-    variable: []
-  };
-}
-
 function main() {
   const data = loadTestcases();
-  const collection = buildCollectionSkeleton(data.name);
+  const collection = new Collection({
+    info: {
+      name: data.name || "Generated Collection"
+    }
+  });
 
   addCollectionVariables(collection, data.variables || {});
 
@@ -222,10 +227,10 @@ function main() {
 
   testcases.forEach((testcase) => {
     const item = buildItem(testcase, defaultHeaders, data.variables || {});
-    collection.item.push(item);
+    collection.items.add(item);
   });
 
-  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(collection, null, 2));
+  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(collection.toJSON(), null, 2));
   console.log(`Processed ${testcases.length} testcases. Collection written to ${OUTPUT_PATH}.`);
 }
 

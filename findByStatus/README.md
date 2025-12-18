@@ -1,6 +1,5 @@
 # QA Agent Postman PoC
 
-## Setup
-- Run `npm install`.
-- Ensure `testcases.json` is in this folder.
-- Run `npm run build` to generate `collection.json`.
+1. Install dependencies: `npm install`
+2. Keep `testcases.json` in this folder.
+3. Generate the collection: `npm run build` (outputs `collection.json`).

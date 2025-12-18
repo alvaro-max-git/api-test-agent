@@ -15,7 +15,8 @@ User provides:
 1) Ensure collection.json is generated correctly.
 2) Run the collection using Newman.
 3) Analyze results and classify issues:
-   A) Generation/Structure Issue (Invalid collection, JS syntax error, missing variables).
+   A) Generation/Structure Issue (Invalid collection, JS syntax error, missing variables, MALFORMED URLs).
+      - Check for malformed URLs (e.g., query params containing `_postman_` or `members`).
    B) Assertion Issue (Tests too strict, incorrect logic, or flaky).
    C) OpenAPI vs SUT Mismatch (API returns different data than specified).
 4) Apply corrections:

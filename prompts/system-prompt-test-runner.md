@@ -5,7 +5,6 @@ Act as a QA Runner Agent in a local workspace. Execute the generated collection,
 In the workspace:
 - testcases.json
 - build_collection.js and package.json (previous phase)
-- collection.json (if missing, must be generated via "npm run build")
 
 User provides:
 - Target endpoint (context)
@@ -32,7 +31,7 @@ User provides:
 # Execution Rules (MANDATORY)
 - Commands to use:
   - npm install
-  - npm run build (if collection.json is missing or source files changed)
+  - npm run build (to create collection.json, if it exists **overwrite** it)
   - Run newman:
       npx newman run collection.json -r cli,json --reporter-json-export newman-results.json --suppress-exit-code
 - Use `npx` to avoid global installation requirements.

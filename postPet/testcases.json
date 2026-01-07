@@ -1,0 +1,282 @@
+{
+  "name": "POST /pet - Add Pet",
+  "baseUrl": "{{baseUrl}}",
+  "defaultHeaders": {
+    "accept": "application/json",
+    "Content-Type": "application/json"
+  },
+  "variables": {
+    "baseUrl": "https://petstore.swagger.io/v2"
+  },
+  "endpoint": {
+    "method": "POST",
+    "path": "/pet"
+  },
+  "testcases": [
+    {
+      "id": "TC-001",
+      "name": "Successfully add a new pet with a valid status: available",
+      "method": "POST",
+      "path": "/pet",
+      "query": {},
+      "headers": {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "id": 0,
+        "category": {
+          "id": 0,
+          "name": "string"
+        },
+        "name": "doggie",
+        "photoUrls": [
+          "string"
+        ],
+        "tags": [
+          {
+            "id": 0,
+            "name": "string"
+          }
+        ],
+        "status": "available"
+      },
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_path_exists", "path": "id" },
+        { "type": "json_path_exists", "path": "name" },
+        { "type": "json_path_exists", "path": "photoUrls[0]" },
+        { "type": "json_path_exists", "path": "status" }
+      ]
+    },
+    {
+      "id": "TC-002",
+      "name": "Successfully add a new pet with a valid status: pending",
+      "method": "POST",
+      "path": "/pet",
+      "query": {},
+      "headers": {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "id": 0,
+        "category": {
+          "id": 0,
+          "name": "string"
+        },
+        "name": "doggie",
+        "photoUrls": [
+          "string"
+        ],
+        "tags": [
+          {
+            "id": 0,
+            "name": "string"
+          }
+        ],
+        "status": "pending"
+      },
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_path_exists", "path": "id" },
+        { "type": "json_path_exists", "path": "name" },
+        { "type": "json_path_exists", "path": "photoUrls[0]" },
+        { "type": "json_path_exists", "path": "status" }
+      ]
+    },
+    {
+      "id": "TC-003",
+      "name": "Successfully add a new pet with a valid status: sold",
+      "method": "POST",
+      "path": "/pet",
+      "query": {},
+      "headers": {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "id": 0,
+        "category": {
+          "id": 0,
+          "name": "string"
+        },
+        "name": "doggie",
+        "photoUrls": [
+          "string"
+        ],
+        "tags": [
+          {
+            "id": 0,
+            "name": "string"
+          }
+        ],
+        "status": "sold"
+      },
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_path_exists", "path": "id" },
+        { "type": "json_path_exists", "path": "name" },
+        { "type": "json_path_exists", "path": "photoUrls[0]" },
+        { "type": "json_path_exists", "path": "status" }
+      ]
+    },
+    {
+      "id": "TC-004",
+      "name": "Successfully add a new pet without specifying a status",
+      "method": "POST",
+      "path": "/pet",
+      "query": {},
+      "headers": {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "id": 0,
+        "category": {
+          "id": 0,
+          "name": "string"
+        },
+        "name": "doggie",
+        "photoUrls": [
+          "string"
+        ],
+        "tags": [
+          {
+            "id": 0,
+            "name": "string"
+          }
+        ]
+      },
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_path_exists", "path": "id" },
+        { "type": "json_path_exists", "path": "name" },
+        { "type": "json_path_exists", "path": "photoUrls[0]" }
+      ]
+    },
+    {
+      "id": "TC-005",
+      "name": "Add a new pet with category and tags",
+      "method": "POST",
+      "path": "/pet",
+      "query": {},
+      "headers": {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "id": 0,
+        "category": {
+          "id": 123,
+          "name": "dogs"
+        },
+        "name": "doggie",
+        "photoUrls": [
+          "string"
+        ],
+        "tags": [
+          {
+            "id": 10,
+            "name": "friendly"
+          },
+          {
+            "id": 11,
+            "name": "trained"
+          }
+        ],
+        "status": "available"
+      },
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        { "type": "status", "equals": 200 },
+        { "type": "header_present", "name": "Content-Type" },
+        { "type": "content_type_includes", "value": "application/json" },
+        { "type": "json_path_exists", "path": "id" },
+        { "type": "json_path_exists", "path": "category.id" },
+        { "type": "json_path_exists", "path": "tags[0].id" }
+      ]
+    },
+    {
+      "id": "TC-006",
+      "name": "Reject creating a pet when the name is missing",
+      "method": "POST",
+      "path": "/pet",
+      "query": {},
+      "headers": {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "id": 0,
+        "category": {
+          "id": 0,
+          "name": "string"
+        },
+        "photoUrls": [
+          "string"
+        ],
+        "tags": [
+          {
+            "id": 0,
+            "name": "string"
+          }
+        ],
+        "status": "available"
+      },
+      "requiresAuth": false,
+      "expectedStatus": 405,
+      "assertions": [
+        { "type": "status", "equals": 405 }
+      ]
+    },
+    {
+      "id": "TC-007",
+      "name": "Reject creating a pet when photos are missing",
+      "method": "POST",
+      "path": "/pet",
+      "query": {},
+      "headers": {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "id": 0,
+        "category": {
+          "id": 0,
+          "name": "string"
+        },
+        "name": "doggie",
+        "tags": [
+          {
+            "id": 0,
+            "name": "string"
+          }
+        ],
+        "status": "available"
+      },
+      "requiresAuth": false,
+      "expectedStatus": 405,
+      "assertions": [
+        { "type": "status", "equals": 405 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,680 @@
+{
+  "item": [
+    {
+      "id": "e655ae5c-71fb-4d30-b29c-3a2649a1891c",
+      "name": "Successfully add a new pet with a valid status: available",
+      "request": {
+        "url": {
+          "raw": "{{baseUrl}}/pet",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "pet"
+          ],
+          "query": []
+        },
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 0,\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"available\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "f1324138-51c3-46b3-901d-c40bb530248f",
+            "type": "text/javascript",
+            "exec": [
+              "function resolvePath(obj, path) {",
+              "  if (obj === null || obj === undefined) return undefined;",
+              "  if (!path) return undefined;",
+              "  const parts = [];",
+              "  const re = /[^.[\\]]+|\\[(\\d+)\\]/g;",
+              "  let m;",
+              "  while ((m = re.exec(path)) !== null) {",
+              "    if (m[0][0] === \"[\") parts.push(Number(m[1]));",
+              "    else parts.push(m[0]);",
+              "  }",
+              "  let cur = obj;",
+              "  for (const part of parts) {",
+              "    if (cur === null || cur === undefined) return undefined;",
+              "    if (typeof part === \"number\") {",
+              "      if (!Array.isArray(cur)) return undefined;",
+              "      cur = cur[part];",
+              "    } else {",
+              "      cur = cur[part];",
+              "    }",
+              "  }",
+              "  return cur;",
+              "}",
+              "",
+              "let __json;",
+              "try { __json = pm.response.json(); } catch (e) { __json = undefined; }",
+              "",
+              "pm.test(\"status/equals: 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"header_present: Content-Type\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"content_type_includes: application/json\", function () {",
+              "  const ct = pm.response.headers.get(\"Content-Type\") || \"\";",
+              "  pm.expect(ct).to.include(\"application/json\");",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: id\", function () {",
+              "  pm.expect(resolvePath(__json, \"id\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: name\", function () {",
+              "  pm.expect(resolvePath(__json, \"name\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: photoUrls[0]\", function () {",
+              "  pm.expect(resolvePath(__json, \"photoUrls[0]\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: status\", function () {",
+              "  pm.expect(resolvePath(__json, \"status\")).to.not.equal(undefined);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "d3456f23-af21-46ef-a8eb-aee8c6d5d716",
+      "name": "Successfully add a new pet with a valid status: pending",
+      "request": {
+        "url": {
+          "raw": "{{baseUrl}}/pet",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "pet"
+          ],
+          "query": []
+        },
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 0,\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"pending\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "a096221d-7fbb-482a-8699-8919dd33d025",
+            "type": "text/javascript",
+            "exec": [
+              "function resolvePath(obj, path) {",
+              "  if (obj === null || obj === undefined) return undefined;",
+              "  if (!path) return undefined;",
+              "  const parts = [];",
+              "  const re = /[^.[\\]]+|\\[(\\d+)\\]/g;",
+              "  let m;",
+              "  while ((m = re.exec(path)) !== null) {",
+              "    if (m[0][0] === \"[\") parts.push(Number(m[1]));",
+              "    else parts.push(m[0]);",
+              "  }",
+              "  let cur = obj;",
+              "  for (const part of parts) {",
+              "    if (cur === null || cur === undefined) return undefined;",
+              "    if (typeof part === \"number\") {",
+              "      if (!Array.isArray(cur)) return undefined;",
+              "      cur = cur[part];",
+              "    } else {",
+              "      cur = cur[part];",
+              "    }",
+              "  }",
+              "  return cur;",
+              "}",
+              "",
+              "let __json;",
+              "try { __json = pm.response.json(); } catch (e) { __json = undefined; }",
+              "",
+              "pm.test(\"status/equals: 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"header_present: Content-Type\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"content_type_includes: application/json\", function () {",
+              "  const ct = pm.response.headers.get(\"Content-Type\") || \"\";",
+              "  pm.expect(ct).to.include(\"application/json\");",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: id\", function () {",
+              "  pm.expect(resolvePath(__json, \"id\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: name\", function () {",
+              "  pm.expect(resolvePath(__json, \"name\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: photoUrls[0]\", function () {",
+              "  pm.expect(resolvePath(__json, \"photoUrls[0]\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: status\", function () {",
+              "  pm.expect(resolvePath(__json, \"status\")).to.not.equal(undefined);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "acfe914d-f2ec-4986-b1a6-8ef888f1ab12",
+      "name": "Successfully add a new pet with a valid status: sold",
+      "request": {
+        "url": {
+          "raw": "{{baseUrl}}/pet",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "pet"
+          ],
+          "query": []
+        },
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 0,\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"sold\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "7cb695e7-62f1-45b2-bcbc-a5ca425d2f47",
+            "type": "text/javascript",
+            "exec": [
+              "function resolvePath(obj, path) {",
+              "  if (obj === null || obj === undefined) return undefined;",
+              "  if (!path) return undefined;",
+              "  const parts = [];",
+              "  const re = /[^.[\\]]+|\\[(\\d+)\\]/g;",
+              "  let m;",
+              "  while ((m = re.exec(path)) !== null) {",
+              "    if (m[0][0] === \"[\") parts.push(Number(m[1]));",
+              "    else parts.push(m[0]);",
+              "  }",
+              "  let cur = obj;",
+              "  for (const part of parts) {",
+              "    if (cur === null || cur === undefined) return undefined;",
+              "    if (typeof part === \"number\") {",
+              "      if (!Array.isArray(cur)) return undefined;",
+              "      cur = cur[part];",
+              "    } else {",
+              "      cur = cur[part];",
+              "    }",
+              "  }",
+              "  return cur;",
+              "}",
+              "",
+              "let __json;",
+              "try { __json = pm.response.json(); } catch (e) { __json = undefined; }",
+              "",
+              "pm.test(\"status/equals: 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"header_present: Content-Type\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"content_type_includes: application/json\", function () {",
+              "  const ct = pm.response.headers.get(\"Content-Type\") || \"\";",
+              "  pm.expect(ct).to.include(\"application/json\");",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: id\", function () {",
+              "  pm.expect(resolvePath(__json, \"id\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: name\", function () {",
+              "  pm.expect(resolvePath(__json, \"name\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: photoUrls[0]\", function () {",
+              "  pm.expect(resolvePath(__json, \"photoUrls[0]\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: status\", function () {",
+              "  pm.expect(resolvePath(__json, \"status\")).to.not.equal(undefined);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "0b3f365b-a2a1-4903-9a9a-3517101dcee6",
+      "name": "Successfully add a new pet without specifying a status",
+      "request": {
+        "url": {
+          "raw": "{{baseUrl}}/pet",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "pet"
+          ],
+          "query": []
+        },
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 0,\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "539a1593-e6d1-46bb-8ce6-983f2fc060f0",
+            "type": "text/javascript",
+            "exec": [
+              "function resolvePath(obj, path) {",
+              "  if (obj === null || obj === undefined) return undefined;",
+              "  if (!path) return undefined;",
+              "  const parts = [];",
+              "  const re = /[^.[\\]]+|\\[(\\d+)\\]/g;",
+              "  let m;",
+              "  while ((m = re.exec(path)) !== null) {",
+              "    if (m[0][0] === \"[\") parts.push(Number(m[1]));",
+              "    else parts.push(m[0]);",
+              "  }",
+              "  let cur = obj;",
+              "  for (const part of parts) {",
+              "    if (cur === null || cur === undefined) return undefined;",
+              "    if (typeof part === \"number\") {",
+              "      if (!Array.isArray(cur)) return undefined;",
+              "      cur = cur[part];",
+              "    } else {",
+              "      cur = cur[part];",
+              "    }",
+              "  }",
+              "  return cur;",
+              "}",
+              "",
+              "let __json;",
+              "try { __json = pm.response.json(); } catch (e) { __json = undefined; }",
+              "",
+              "pm.test(\"status/equals: 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"header_present: Content-Type\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"content_type_includes: application/json\", function () {",
+              "  const ct = pm.response.headers.get(\"Content-Type\") || \"\";",
+              "  pm.expect(ct).to.include(\"application/json\");",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: id\", function () {",
+              "  pm.expect(resolvePath(__json, \"id\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: name\", function () {",
+              "  pm.expect(resolvePath(__json, \"name\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: photoUrls[0]\", function () {",
+              "  pm.expect(resolvePath(__json, \"photoUrls[0]\")).to.not.equal(undefined);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ca63bee3-b883-4b4a-bdb9-2cfabcf986bb",
+      "name": "Add a new pet with category and tags",
+      "request": {
+        "url": {
+          "raw": "{{baseUrl}}/pet",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "pet"
+          ],
+          "query": []
+        },
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 0,\n  \"category\": {\n    \"id\": 123,\n    \"name\": \"dogs\"\n  },\n  \"name\": \"doggie\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 10,\n      \"name\": \"friendly\"\n    },\n    {\n      \"id\": 11,\n      \"name\": \"trained\"\n    }\n  ],\n  \"status\": \"available\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "b930af5b-c544-47e9-a06d-2a58b1fcc198",
+            "type": "text/javascript",
+            "exec": [
+              "function resolvePath(obj, path) {",
+              "  if (obj === null || obj === undefined) return undefined;",
+              "  if (!path) return undefined;",
+              "  const parts = [];",
+              "  const re = /[^.[\\]]+|\\[(\\d+)\\]/g;",
+              "  let m;",
+              "  while ((m = re.exec(path)) !== null) {",
+              "    if (m[0][0] === \"[\") parts.push(Number(m[1]));",
+              "    else parts.push(m[0]);",
+              "  }",
+              "  let cur = obj;",
+              "  for (const part of parts) {",
+              "    if (cur === null || cur === undefined) return undefined;",
+              "    if (typeof part === \"number\") {",
+              "      if (!Array.isArray(cur)) return undefined;",
+              "      cur = cur[part];",
+              "    } else {",
+              "      cur = cur[part];",
+              "    }",
+              "  }",
+              "  return cur;",
+              "}",
+              "",
+              "let __json;",
+              "try { __json = pm.response.json(); } catch (e) { __json = undefined; }",
+              "",
+              "pm.test(\"status/equals: 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"header_present: Content-Type\", function () {",
+              "  pm.expect(pm.response.headers.has(\"Content-Type\")).to.eql(true);",
+              "});",
+              "",
+              "pm.test(\"content_type_includes: application/json\", function () {",
+              "  const ct = pm.response.headers.get(\"Content-Type\") || \"\";",
+              "  pm.expect(ct).to.include(\"application/json\");",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: id\", function () {",
+              "  pm.expect(resolvePath(__json, \"id\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: category.id\", function () {",
+              "  pm.expect(resolvePath(__json, \"category.id\")).to.not.equal(undefined);",
+              "});",
+              "",
+              "pm.test(\"json_path_exists: tags[0].id\", function () {",
+              "  pm.expect(resolvePath(__json, \"tags[0].id\")).to.not.equal(undefined);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "0984df6f-bcd2-47e9-88d4-48aea07f5428",
+      "name": "Reject creating a pet when the name is missing",
+      "request": {
+        "url": {
+          "raw": "{{baseUrl}}/pet",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "pet"
+          ],
+          "query": []
+        },
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 0,\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"available\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "202a2d78-9d26-414b-b156-579e853f8423",
+            "type": "text/javascript",
+            "exec": [
+              "function resolvePath(obj, path) {",
+              "  if (obj === null || obj === undefined) return undefined;",
+              "  if (!path) return undefined;",
+              "  const parts = [];",
+              "  const re = /[^.[\\]]+|\\[(\\d+)\\]/g;",
+              "  let m;",
+              "  while ((m = re.exec(path)) !== null) {",
+              "    if (m[0][0] === \"[\") parts.push(Number(m[1]));",
+              "    else parts.push(m[0]);",
+              "  }",
+              "  let cur = obj;",
+              "  for (const part of parts) {",
+              "    if (cur === null || cur === undefined) return undefined;",
+              "    if (typeof part === \"number\") {",
+              "      if (!Array.isArray(cur)) return undefined;",
+              "      cur = cur[part];",
+              "    } else {",
+              "      cur = cur[part];",
+              "    }",
+              "  }",
+              "  return cur;",
+              "}",
+              "",
+              "let __json;",
+              "try { __json = pm.response.json(); } catch (e) { __json = undefined; }",
+              "",
+              "pm.test(\"status/equals: 405\", function () {",
+              "  pm.response.to.have.status(405);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "86f906fd-1b98-42ef-9172-3cd47daaf1fb",
+      "name": "Reject creating a pet when photos are missing",
+      "request": {
+        "url": {
+          "raw": "{{baseUrl}}/pet",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "pet"
+          ],
+          "query": []
+        },
+        "method": "POST",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 0,\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"name\": \"doggie\",\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"available\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "header": [
+          {
+            "key": "accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "8da31b26-7bec-4c62-8dc0-12e6a8914682",
+            "type": "text/javascript",
+            "exec": [
+              "function resolvePath(obj, path) {",
+              "  if (obj === null || obj === undefined) return undefined;",
+              "  if (!path) return undefined;",
+              "  const parts = [];",
+              "  const re = /[^.[\\]]+|\\[(\\d+)\\]/g;",
+              "  let m;",
+              "  while ((m = re.exec(path)) !== null) {",
+              "    if (m[0][0] === \"[\") parts.push(Number(m[1]));",
+              "    else parts.push(m[0]);",
+              "  }",
+              "  let cur = obj;",
+              "  for (const part of parts) {",
+              "    if (cur === null || cur === undefined) return undefined;",
+              "    if (typeof part === \"number\") {",
+              "      if (!Array.isArray(cur)) return undefined;",
+              "      cur = cur[part];",
+              "    } else {",
+              "      cur = cur[part];",
+              "    }",
+              "  }",
+              "  return cur;",
+              "}",
+              "",
+              "let __json;",
+              "try { __json = pm.response.json(); } catch (e) { __json = undefined; }",
+              "",
+              "pm.test(\"status/equals: 405\", function () {",
+              "  pm.response.to.have.status(405);",
+              "});",
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "any",
+      "value": "https://petstore.swagger.io/v2",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "d0e697a5-75da-4dcd-86c2-3fcb6db6e1f9",
+    "name": "POST /pet - Add Pet",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  }
+}

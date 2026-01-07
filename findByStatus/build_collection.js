@@ -1,237 +1,310 @@
+/* eslint-disable no-console */
+
 const fs = require("fs");
 const path = require("path");
-const {
-  Collection,
-  Url,
-  Variable,
-  Script
-} = require("postman-collection");
+const sdk = require("postman-collection");
 
-const TESTCASE_PATH = path.join(__dirname, "testcases.json");
-const OUTPUT_PATH = path.join(__dirname, "collection.json");
-
-function ensureFileExists(targetPath) {
-  if (!fs.existsSync(targetPath)) {
-    throw new Error(`Missing required file: ${targetPath}`);
-  }
+function isPlainObject(value) {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    (Object.getPrototypeOf(value) === Object.prototype ||
+      Object.getPrototypeOf(value) === null)
+  );
 }
 
-function loadTestcases() {
-  ensureFileExists(TESTCASE_PATH);
-  const raw = fs.readFileSync(TESTCASE_PATH, "utf8");
-  try {
-    return JSON.parse(raw);
-  } catch (error) {
-    throw new Error(`Unable to parse testcases.json: ${error.message}`);
-  }
+function ensurePrimitive(value, context) {
+  const t = typeof value;
+  if (t === "string" || t === "number" || t === "boolean") return;
+  throw new Error(
+    `Invalid ${context}: expected primitive (string/number/boolean), got ${t}`
+  );
 }
 
-function toLiteral(value) {
-  return JSON.stringify(value == null ? "" : value);
+function splitPathSegments(p) {
+  const clean = String(p || "").split("?")[0];
+  return clean
+    .split("/")
+    .filter(Boolean)
+    .map((s) => String(s));
 }
 
-function addCollectionVariables(collection, variables) {
-  const resolvedVars = variables || {};
-  const baseUrlValue = resolvedVars.baseUrl || "";
-  collection.variables.add(new Variable({ key: "baseUrl", value: baseUrlValue }));
-
-  Object.keys(resolvedVars).forEach((key) => {
-    if (key === "baseUrl") {
-      return;
-    }
-    collection.variables.add(new Variable({ key, value: resolvedVars[key] }));
-  });
-}
-
-function hasHeader(headersObj, name) {
-  return Object.keys(headersObj).some((key) => key.toLowerCase() === name.toLowerCase());
-}
-
-function mergeHeaders(defaultHeaders, testcaseHeaders) {
-  return { ...(defaultHeaders || {}), ...(testcaseHeaders || {}) };
-}
-
-function applyAuth(headersObj, requiresAuth, variables) {
-  if (!requiresAuth) {
-    return;
+function buildQueryEntries(queryObj) {
+  if (queryObj == null) return [];
+  if (!isPlainObject(queryObj)) {
+    throw new Error(`tc.query must be a plain object; got ${typeof queryObj}`);
   }
 
-  if (variables && variables.accessToken) {
-    headersObj.Authorization = "Bearer {{accessToken}}";
-  } else {
-    console.warn("requiresAuth is true but variables.accessToken is missing");
-  }
-}
+  const entries = [];
+  for (const [key, value] of Object.entries(queryObj)) {
+    if (value === null || value === undefined) continue;
 
-function ensureContentType(headersObj, body) {
-  if (body == null) {
-    return;
-  }
-  if (!hasHeader(headersObj, "Content-Type")) {
-    headersObj["Content-Type"] = "application/json";
-  }
-}
-
-function buildQueryParams(query) {
-  const params = [];
-  Object.entries(query || {}).forEach(([key, value]) => {
     if (Array.isArray(value)) {
-      value.forEach((entry) => {
-        params.push({ key, value: String(entry) });
-      });
-    } else if (value !== undefined && value !== null) {
-      params.push({ key, value: String(value) });
+      for (const v of value) {
+        if (v === null || v === undefined) continue;
+        ensurePrimitive(v, `query value for key '${key}'`);
+        entries.push({ key: String(key), value: String(v) });
+      }
+      continue;
     }
-  });
-  return params;
+
+    ensurePrimitive(value, `query value for key '${key}'`);
+    entries.push({ key: String(key), value: String(value) });
+  }
+
+  return entries;
+}
+
+function buildRawUrl(rawBase, queryEntries) {
+  if (!queryEntries || queryEntries.length === 0) return rawBase;
+  const qs = queryEntries
+    .map(
+      ({ key, value }) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    )
+    .join("&");
+  return `${rawBase}?${qs}`;
+}
+
+function hasHeader(headersObj, headerName) {
+  const target = String(headerName).toLowerCase();
+  return Object.keys(headersObj || {}).some((k) => String(k).toLowerCase() === target);
 }
 
 function buildTestScript(assertions) {
-  const steps = [];
-  const needsJson = (assertions || []).some((assertion) => {
-    return ["json_is_array", "json_array_min_length", "json_path_exists"].includes(assertion.type);
-  });
+  const lines = [];
 
-  if (needsJson) {
-    steps.push("const jsonData = (() => {");
-    steps.push("  try {");
-    steps.push("    return pm.response.json();");
-    steps.push("  } catch (e) {");
-    steps.push("    return null;");
-    steps.push("  }");
-    steps.push("})();");
+  // Helpers first
+  lines.push("function resolvePath(obj, path) {");
+  lines.push("  if (obj === null || obj === undefined) return undefined;");
+  lines.push("  if (!path || typeof path !== 'string') return undefined;");
+  lines.push("  // Supports dot notation and array indices like [0].id");
+  lines.push("  const normalized = path.replace(/\\[(\\d+)\\]/g, '.$1');");
+  lines.push("  const parts = normalized.split('.').filter(Boolean);");
+  lines.push("  let cur = obj;");
+  lines.push("  for (const part of parts) {");
+  lines.push("    if (cur === null || cur === undefined) return undefined;");
+  lines.push("    if (Object(cur) !== cur) return undefined;");
+  lines.push("    cur = cur[part];");
+  lines.push("  }");
+  lines.push("  return cur;");
+  lines.push("}");
 
-    if ((assertions || []).some((assertion) => assertion.type === "json_path_exists")) {
-      steps.push("function resolvePath(obj, path) {");
-      steps.push("  if (!obj || typeof path !== 'string') { return undefined; }");
-      steps.push("  const segments = path.replace(/\\[(\\d+)\\]/g, '.$1').split('.').filter(Boolean);");
-      steps.push("  return segments.reduce((acc, key) => { return acc && acc[key] !== undefined ? acc[key] : undefined; }, obj);");
-      steps.push("}");
-    }
-  }
+  lines.push("function tryParseJson() {");
+  lines.push("  try { return pm.response.json(); } catch (e) { return undefined; }");
+  lines.push("}");
 
-  (assertions || []).forEach((assertion, index) => {
-    const label = `Assertion ${index + 1}: ${assertion.type}`;
+  for (const assertion of assertions || []) {
+    if (!assertion || typeof assertion !== "object") continue;
+
     switch (assertion.type) {
-      case "status":
-        steps.push(`pm.test(${toLiteral(label)}, function () {`);
-        steps.push(`  pm.response.to.have.status(${assertion.equals});`);
-        steps.push("});");
+      case "status": {
+        lines.push(
+          `pm.test('Status is ${assertion.equals}', function () { pm.response.to.have.status(${Number(
+            assertion.equals
+          )}); });`
+        );
         break;
-      case "header_present":
-        steps.push(`pm.test(${toLiteral(label)}, function () {`);
-        steps.push(`  pm.expect(pm.response.headers.has(${toLiteral(assertion.name)})).to.eql(true);`);
-        steps.push("});");
+      }
+
+      case "header_present": {
+        const name = String(assertion.name || "");
+        lines.push(
+          `pm.test('Header present: ${name}', function () { pm.expect(pm.response.headers.has(${JSON.stringify(
+            name
+          )})).to.eql(true); });`
+        );
         break;
-      case "content_type_includes":
-        steps.push(`pm.test(${toLiteral(label)}, function () {`);
-        steps.push(`  pm.expect(pm.response.headers.get('Content-Type')).to.include(${toLiteral(assertion.value)});`);
-        steps.push("});");
+      }
+
+      case "content_type_includes": {
+        const value = String(assertion.value || "");
+        lines.push(
+          `pm.test('Content-Type includes ${value}', function () { pm.expect(pm.response.headers.get('Content-Type') || '').to.include(${JSON.stringify(
+            value
+          )}); });`
+        );
         break;
-      case "json_is_array":
-        steps.push(`pm.test(${toLiteral(label)}, function () {`);
-        steps.push("  pm.expect(Array.isArray(jsonData)).to.eql(true);");
-        steps.push("});");
+      }
+
+      case "json_is_array": {
+        lines.push(
+          "pm.test('Response JSON is an array', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+        );
         break;
-      case "json_array_min_length":
-        steps.push(`pm.test(${toLiteral(label)}, function () {`);
-        steps.push("  const length = Array.isArray(jsonData) ? jsonData.length : 0;");
-        steps.push(`  pm.expect(length).to.be.at.least(${assertion.min});`);
-        steps.push("});");
+      }
+
+      case "json_array_min_length": {
+        const min = Number(assertion.min);
+        lines.push(
+          `pm.test('JSON array min length ${min}', function () { pm.expect(pm.response.json().length).to.be.at.least(${min}); });`
+        );
         break;
-      case "json_path_exists":
-        steps.push(`pm.test(${toLiteral(label)}, function () {`);
-        steps.push(`  pm.expect(resolvePath(jsonData, ${toLiteral(assertion.path)}) !== undefined).to.eql(true);`);
-        steps.push("});");
+      }
+
+      case "json_path_exists": {
+        const p = String(assertion.path || "");
+        lines.push(
+          `pm.test('JSON path exists: ${p}', function () { const json = tryParseJson(); pm.expect(json, 'Response body is valid JSON').to.not.eql(undefined); pm.expect(resolvePath(json, ${JSON.stringify(
+            p
+          )}), 'Path ${p}').to.not.eql(undefined); });`
+        );
         break;
+      }
+
       default:
-        steps.push(`pm.test(${toLiteral(`Unhandled assertion type: ${assertion.type}`)}, function () {`);
-        steps.push("  pm.expect(true).to.eql(true);");
-        steps.push("});");
+        // Unknown assertion type: ignore for now (keeps generator robust)
+        break;
     }
-  });
-
-  if (steps.length === 0) {
-    steps.push("pm.test('No assertions defined', function () { pm.expect(true).to.eql(true); });");
   }
 
-  return steps;
-}
-
-function buildRequest(testcase, defaultHeaders, variables) {
-  const headersObj = mergeHeaders(defaultHeaders, testcase.headers);
-  applyAuth(headersObj, testcase.requiresAuth, variables);
-  ensureContentType(headersObj, testcase.body);
-
-  const queryParams = buildQueryParams(testcase.query);
-  
-  // Construct the full URL string with query parameters
-  let fullUrl = `{{baseUrl}}${testcase.path}`;
-  if (queryParams.length > 0) {
-    const queryString = queryParams.map(p => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`).join('&');
-    fullUrl += `?${queryString}`;
-  }
-
-  // Use Url helper to parse, but convert to JSON immediately
-  const url = new Url(fullUrl).toJSON();
-
-  const headers = Object.entries(headersObj).map(([key, value]) => ({ key, value }));
-
-  const requestDefinition = {
-    url,
-    method: testcase.method,
-    header: headers
-  };
-
-  if (testcase.body != null) {
-    const rawBody = typeof testcase.body === "string" ? testcase.body : JSON.stringify(testcase.body, null, 2);
-    requestDefinition.body = { mode: "raw", raw: rawBody };
-  }
-
-  return requestDefinition;
-}
-
-function buildItem(testcase, defaultHeaders, variables) {
-  const request = buildRequest(testcase, defaultHeaders, variables);
-  const script = buildTestScript(testcase.assertions || []);
-
-  // We can use Script object or plain object. Script object is fine usually.
-  // But let's use plain object for safety.
-  const event = {
-    listen: "test",
-    script: {
-        type: "text/javascript",
-        exec: script
-    }
-  };
-
-  return {
-    name: testcase.name || testcase.id,
-    request,
-    event: [event]
-  };
+  return lines;
 }
 
 function main() {
-  const data = loadTestcases();
-  const collection = new Collection({
+  const rootDir = __dirname;
+  const testcasesPath = path.join(rootDir, "testcases.json");
+  const featurePath = path.join(rootDir, "findByStatus.feature");
+  const outputPath = path.join(rootDir, "collection.json");
+
+  if (!fs.existsSync(testcasesPath)) {
+    console.error(`Missing file: ${testcasesPath}`);
+    process.exit(1);
+  }
+
+  const raw = fs.readFileSync(testcasesPath, "utf8");
+  let spec;
+  try {
+    spec = JSON.parse(raw);
+  } catch (e) {
+    console.error("Failed to parse testcases.json as JSON:", e.message);
+    process.exit(1);
+  }
+
+  if (!spec || typeof spec !== "object") {
+    console.error("Invalid testcases.json: expected an object at top-level");
+    process.exit(1);
+  }
+
+  const featureDescription = fs.existsSync(featurePath)
+    ? fs.readFileSync(featurePath, "utf8")
+    : "";
+
+  const collection = new sdk.Collection({
     info: {
-      name: data.name || "Generated Collection"
+      name: spec.name || "API Collection",
+      description: featureDescription || undefined
     }
   });
 
-  addCollectionVariables(collection, data.variables || {});
+  // Variables: baseUrl + all keys from spec.variables
+  const vars = isPlainObject(spec.variables) ? spec.variables : {};
+  const varEntries = new Map();
+  varEntries.set("baseUrl", vars.baseUrl ?? spec.baseUrl ?? "");
+  for (const [k, v] of Object.entries(vars)) varEntries.set(k, v);
 
-  const defaultHeaders = data.defaultHeaders || {};
-  const testcases = Array.isArray(data.testcases) ? data.testcases : [];
+  for (const [key, value] of varEntries.entries()) {
+    collection.variables.add(new sdk.Variable({ key, value: value ?? "" }));
+  }
 
-  testcases.forEach((testcase) => {
-    const item = buildItem(testcase, defaultHeaders, data.variables || {});
+  const defaultHeaders = isPlainObject(spec.defaultHeaders) ? spec.defaultHeaders : {};
+
+  const intendedUrls = [];
+
+  const testcases = Array.isArray(spec.testcases) ? spec.testcases : [];
+  for (const tc of testcases) {
+    if (!tc || typeof tc !== "object") continue;
+
+    const method = String(tc.method || spec.endpoint?.method || "GET").toUpperCase();
+    const tcPath = String(tc.path || spec.endpoint?.path || "");
+
+    const headers = {
+      ...defaultHeaders,
+      ...(isPlainObject(tc.headers) ? tc.headers : {})
+    };
+
+    // Body handling: if present, ensure Content-Type: application/json
+    let requestBody;
+    if (tc.body !== null && tc.body !== undefined) {
+      if (!hasHeader(headers, "Content-Type")) {
+        headers["Content-Type"] = "application/json";
+      }
+
+      const rawBody =
+        typeof tc.body === "string" ? tc.body : JSON.stringify(tc.body);
+      requestBody = {
+        mode: "raw",
+        raw: rawBody,
+        options: { raw: { language: "json" } }
+      };
+    }
+
+    // Auth handling
+    if (tc.requiresAuth === true) {
+      const accessToken = String(vars.accessToken || "");
+      if (accessToken) {
+        headers["Authorization"] = "Bearer {{accessToken}}";
+      } else {
+        console.warn(
+          `[WARN] ${tc.id || tc.name || "testcase"}: requiresAuth=true but variables.accessToken is missing/empty. Proceeding without Authorization header.`
+        );
+      }
+    }
+
+    // URL handling (with strict guards) + intended URL tracking (export workaround)
+    const url = new sdk.Url("{{baseUrl}}" + tcPath);
+
+    const queryEntries = buildQueryEntries(tc.query || {});
+    for (const { key, value } of queryEntries) {
+      url.query.add({ key, value });
+    }
+
+    const intendedUrl = {
+      raw: buildRawUrl("{{baseUrl}}" + tcPath, queryEntries),
+      host: ["{{baseUrl}}"],
+      path: splitPathSegments(tcPath),
+      ...(queryEntries.length ? { query: queryEntries } : {})
+    };
+    intendedUrls.push(intendedUrl);
+
+    const request = new sdk.Request({
+      method,
+      header: Object.entries(headers).map(([key, value]) => ({
+        key: String(key),
+        value: String(value)
+      })),
+      url: url.toJSON(),
+      ...(requestBody ? { body: requestBody } : {})
+    });
+
+    const testLines = buildTestScript(tc.assertions);
+    const item = new sdk.Item({
+      name: tc.name ? `${tc.id ? tc.id + " - " : ""}${tc.name}` : (tc.id || "Request"),
+      request,
+      event: [
+        new sdk.Event({
+          listen: "test",
+          script: new sdk.Script({ exec: testLines })
+        })
+      ]
+    });
+
     collection.items.add(item);
-  });
+  }
 
-  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(collection.toJSON(), null, 2));
-  console.log(`Processed ${testcases.length} testcases. Collection written to ${OUTPUT_PATH}.`);
+  // Export bug workaround (required): overwrite request.url with plain JSON
+  const exported = collection.toJSON();
+  if (!Array.isArray(exported.item)) exported.item = [];
+
+  for (let i = 0; i < exported.item.length; i += 1) {
+    if (exported.item[i]?.request) {
+      exported.item[i].request.url = intendedUrls[i];
+    }
+  }
+
+  fs.writeFileSync(outputPath, JSON.stringify(exported, null, 2), "utf8");
+  console.log(`Processed ${testcases.length} testcase(s).`);
+  console.log(`Generated: ${outputPath}`);
 }
 
 main();

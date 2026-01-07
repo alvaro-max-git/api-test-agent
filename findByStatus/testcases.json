@@ -1,11 +1,12 @@
 {
-  "name": "Petstore - findByStatus",
+  "name": "Fetch pets by status",
   "baseUrl": "{{baseUrl}}",
   "defaultHeaders": {
-    "accept": "application/json"
+    "Accept": "application/json"
   },
   "variables": {
-    "baseUrl": "https://petstore.swagger.io/v2"
+    "baseUrl": "https://petstore.swagger.io/v2",
+    "accessToken": ""
   },
   "endpoint": {
     "method": "GET",
@@ -14,81 +15,279 @@
   "testcases": [
     {
       "id": "TC-001",
-      "name": "Successful lookup with status available",
+      "name": "Retrieve pets with a valid status: available",
       "method": "GET",
       "path": "/pet/findByStatus",
-      "query": { "status": ["available"] },
+      "query": {
+        "status": [
+          "available"
+        ]
+      },
       "headers": {
-        "accept": "application/json"
+        "Accept": "application/json"
       },
       "body": null,
       "requiresAuth": false,
       "expectedStatus": 200,
       "assertions": [
-        { "type": "status", "equals": 200 },
-        { "type": "header_present", "name": "Content-Type" },
-        { "type": "content_type_includes", "value": "application/json" },
-        { "type": "json_is_array" },
-        { "type": "json_array_min_length", "min": 0 },
-        { "type": "json_path_exists", "path": "[0].id" }
+        {
+          "type": "status",
+          "equals": 200
+        },
+        {
+          "type": "header_present",
+          "name": "Content-Type"
+        },
+        {
+          "type": "content_type_includes",
+          "value": "application/json"
+        },
+        {
+          "type": "json_is_array"
+        },
+        {
+          "type": "json_array_min_length",
+          "min": 1
+        },
+        {
+          "type": "json_path_exists",
+          "path": "[0].id"
+        }
       ]
     },
     {
       "id": "TC-002",
-      "name": "Lookup with multiple statuses available and sold",
+      "name": "Retrieve pets with a valid status: pending",
       "method": "GET",
       "path": "/pet/findByStatus",
-      "query": { "status": ["available", "sold"] },
+      "query": {
+        "status": [
+          "pending"
+        ]
+      },
       "headers": {
-        "accept": "application/json"
+        "Accept": "application/json"
       },
       "body": null,
       "requiresAuth": false,
       "expectedStatus": 200,
       "assertions": [
-        { "type": "status", "equals": 200 },
-        { "type": "header_present", "name": "Content-Type" },
-        { "type": "content_type_includes", "value": "application/json" },
-        { "type": "json_is_array" },
-        { "type": "json_array_min_length", "min": 0 }
+        {
+          "type": "status",
+          "equals": 200
+        },
+        {
+          "type": "header_present",
+          "name": "Content-Type"
+        },
+        {
+          "type": "content_type_includes",
+          "value": "application/json"
+        },
+        {
+          "type": "json_is_array"
+        },
+        {
+          "type": "json_array_min_length",
+          "min": 1
+        },
+        {
+          "type": "json_path_exists",
+          "path": "[0].id"
+        }
       ]
     },
     {
       "id": "TC-003",
-      "name": "Missing status parameter",
+      "name": "Retrieve pets with a valid status: sold",
       "method": "GET",
       "path": "/pet/findByStatus",
-      "query": {},
+      "query": {
+        "status": [
+          "sold"
+        ]
+      },
       "headers": {
-        "accept": "application/json"
+        "Accept": "application/json"
       },
       "body": null,
       "requiresAuth": false,
       "expectedStatus": 200,
       "assertions": [
-        { "type": "status", "equals": 200 },
-        { "type": "header_present", "name": "Content-Type" },
-        { "type": "content_type_includes", "value": "application/json" },
-        { "type": "json_is_array" },
-        { "type": "json_array_min_length", "min": 0 }
+        {
+          "type": "status",
+          "equals": 200
+        },
+        {
+          "type": "header_present",
+          "name": "Content-Type"
+        },
+        {
+          "type": "content_type_includes",
+          "value": "application/json"
+        },
+        {
+          "type": "json_is_array"
+        },
+        {
+          "type": "json_array_min_length",
+          "min": 1
+        },
+        {
+          "type": "json_path_exists",
+          "path": "[0].id"
+        }
       ]
     },
     {
       "id": "TC-004",
-      "name": "Invalid status unknown",
+      "name": "Retrieve pets with multiple statuses: available,pending",
       "method": "GET",
       "path": "/pet/findByStatus",
-      "query": { "status": ["unknown"] },
+      "query": {
+        "status": [
+          "available",
+          "pending"
+        ]
+      },
       "headers": {
-        "accept": "application/json"
+        "Accept": "application/json"
+      },
+      "body": null,
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        {
+          "type": "status",
+          "equals": 200
+        },
+        {
+          "type": "header_present",
+          "name": "Content-Type"
+        },
+        {
+          "type": "content_type_includes",
+          "value": "application/json"
+        },
+        {
+          "type": "json_is_array"
+        },
+        {
+          "type": "json_array_min_length",
+          "min": 1
+        },
+        {
+          "type": "json_path_exists",
+          "path": "[0].id"
+        }
+      ]
+    },
+    {
+      "id": "TC-005",
+      "name": "Retrieve pets with multiple statuses: pending,sold",
+      "method": "GET",
+      "path": "/pet/findByStatus",
+      "query": {
+        "status": [
+          "pending",
+          "sold"
+        ]
+      },
+      "headers": {
+        "Accept": "application/json"
+      },
+      "body": null,
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        {
+          "type": "status",
+          "equals": 200
+        },
+        {
+          "type": "header_present",
+          "name": "Content-Type"
+        },
+        {
+          "type": "content_type_includes",
+          "value": "application/json"
+        },
+        {
+          "type": "json_is_array"
+        },
+        {
+          "type": "json_array_min_length",
+          "min": 1
+        },
+        {
+          "type": "json_path_exists",
+          "path": "[0].id"
+        }
+      ]
+    },
+    {
+      "id": "TC-006",
+      "name": "Missing status returns an empty list",
+      "method": "GET",
+      "path": "/pet/findByStatus",
+      "query": {},
+      "headers": {
+        "Accept": "application/json"
+      },
+      "body": null,
+      "requiresAuth": false,
+      "expectedStatus": 200,
+      "assertions": [
+        {
+          "type": "status",
+          "equals": 200
+        },
+        {
+          "type": "header_present",
+          "name": "Content-Type"
+        },
+        {
+          "type": "content_type_includes",
+          "value": "application/json"
+        },
+        {
+          "type": "json_is_array"
+        },
+        {
+          "type": "json_array_min_length",
+          "min": 0
+        }
+      ]
+    },
+    {
+      "id": "TC-007",
+      "name": "Unsupported status is rejected: unknown",
+      "method": "GET",
+      "path": "/pet/findByStatus",
+      "query": {
+        "status": [
+          "unknown"
+        ]
+      },
+      "headers": {
+        "Accept": "application/json"
       },
       "body": null,
       "requiresAuth": false,
       "expectedStatus": 400,
       "assertions": [
-        { "type": "status", "equals": 400 },
-        { "type": "header_present", "name": "Content-Type" },
-        { "type": "content_type_includes", "value": "application/json" }
+        {
+          "type": "status",
+          "equals": 400
+        },
+        {
+          "type": "header_present",
+          "name": "Content-Type"
+        },
+        {
+          "type": "content_type_includes",
+          "value": "application/json"
+        }
       ]
     }
   ]

@@ -8,31 +8,46 @@ Given:
 - The details of the user request
 
 Produce:
-1) A Gherkin file (.feature) with acceptance scenarios (happy path + negative + relevant edge cases).
-2) A testcases.json file (strict format defined below) used to automatically build a Postman collection.
+1) A Gherkin file (.feature) with business-readable acceptance scenarios (happy path, negative, and edge cases).
+2) A testcases.json file with strict technical assertions used to automatically build a Postman collection.
 
 # Swagger Analysis Rules
 - Focus ONLY on the target endpoint specified by the user.
-- Extract at minimum: method, path, query params, headers, body (if applicable), defined response codes, and relevant types/structures.
-- Do NOT hardcode the host/domain. Always use `{{baseUrl}}` variable in the output.
-- If the endpoint has security (e.g., OAuth), DO NOT invent tokens. Generate:
-  - A "no auth" case (if it makes sense) marking it as "requiresAuth": true/false.
-  - Variable placeholders (e.g., {{accessToken}}) in testcases.json where necessary.
-- Do not add setup/teardown flows outside the target endpoint unless explicitly requested.
+- Extract: method, path, query params, headers, body structure, response codes, and schemas.
+- Always use the {{baseUrl}} variable for the host.
+- For security (OAuth/API Key), use variable placeholders like {{accessToken}} and mark requiresAuth: true. 
 
-# Gherkin Requirements
-- Include Feature + Background (only if it adds value).
-- Cover at least:
-  - Happy path.
-  - Validation of required parameters.
-  - Invalid values according to enum/format.
-  - Cases with multiple values (if parameter is array/multi).
-- Write in English, clear style, no ambiguity and from the user's point of view.
-- **Crucial**: Add a comment line `# Target URL: {{baseUrl}}...` in every Scenario to document the expected request URL.
-- Prefer Scenario Outline for simple combinatorics (e.g., status enums).
-- Avoid overly strict checks on the body; use robust checks: type, presence of key fields, non-null arrays, JSON schemas, etc.
+
+
+# Gherkin Requirements (Business Level)
+
+- Readability: Scenarios must be written in clear English, understandable by non-technical stakeholders.
+
+- Abstract Technical Details: Avoid mentioning headers (except for Auth context), JSON structures, or internal data types (e.g., "JSON array", "Content-Type").
+
+- Permitted Technicality: HTTP status codes are the only technical detail allowed as they define the contract outcome (e.g., "status code 200").
+
+- Prosaic Assertions: Use descriptive language for the response body:
+
+  - Technical: "response body should be a JSON array" -> Business: "the response should be a list of items".
+  - Technical: "path [0].id exists" -> Business: "the response items should include their unique identifiers".
+  - Technical: "array length 0" -> Business: "the response should be empty".
+
+- Structure: Include Feature + Background (if relevant). Use Scenario Outlines for variations (e.g., status enums).
+
+- Comment: Add # Target URL: {{baseUrl}}... in every Scenario.
+
+
 
 # testcases.json: Strict Format (DO NOT DEVIATE)
+This file MUST contain the technical implementation of the Gherkin scenarios. 
+
+- 1-to-1 Mapping: Every single row in a Gherkin Examples table MUST result in a separate, unique object inside the testcases array.
+- Naming: For expanded scenarios, the name in JSON should include the specific value used (e.g., "Fetch pets with status: pending").
+
+Unique IDs: Ensure each generated test case has a unique id (TC-001, TC-002, etc.).
+
+
 Generate EXACTLY this JSON structure (no comments allowed), with these keys:
 
 {
@@ -44,7 +59,7 @@ Generate EXACTLY this JSON structure (no comments allowed), with these keys:
   "testcases": [
     {
       "id": "TC-###",
-      "name": "string",
+      "name": "Match Scenario Name + Example Value",
       "method": "GET|POST|PUT|DELETE|PATCH",
       "path": "/...",
       "query": { "param": "value | [values]" },

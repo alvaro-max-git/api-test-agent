@@ -1,5 +1,7 @@
 {
   "name": "qa-agent-postman-poc",
+  "version": "1.0.0",
+  "private": true,
   "scripts": {
     "build": "node build_collection.js"
   },
